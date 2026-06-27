@@ -96,7 +96,7 @@ packer build your-config-file.json
 
 ### Example Packer Configuration
 
-This example demonstrates building a Debian 11 VM named "Zakops" based on an existing template. (your-config-file.json)
+This example demonstrates building a Debian 12 VM named "Zakops" based on an existing template. (your-config-file.json)
 
 ```bash
 {
@@ -117,8 +117,8 @@ This example demonstrates building a Debian 11 VM named "Zakops" based on an exi
         "displayName": "Zakops-Machine", // Name displayed in vSphere/ESXi inventory
         "memsize": "4096",           // RAM in MB (e.g., 4GB)
         "numvcpus": "2",             // Number of virtual CPUs
-        "guestOS": "debian11-64"     // VMware Guest OS Identifier (important for optimizations)
-        //"annotation": "Built by Packer - Debian 11 Base" // Optional descriptive note
+        "guestOS": "debian12-64"     // VMware Guest OS Identifier (important for optimizations)
+        //"annotation": "Built by Packer - Debian 12 Base" // Optional descriptive note
       },
 
       // --- ESXi Connection Settings ---
