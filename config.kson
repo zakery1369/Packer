@@ -1,0 +1,63 @@
+{
+  "builders": [
+    {
+      // --- Builder Type ---
+      "type": "vmware-vmx", // Uses an existing VMX file as a base
+
+      // --- Source VM Template ---
+      // Path to the source VMX relative to the 'remote_datastore'
+      "source_path": "New Template [Debian12]/New Template [Debian12].vmx",
+      // Alternative: If source is on a *different* datastore, use relative path hack
+      // "source_path": "../Datastore-Raid5/Debian12/Debian12.vmx",
+
+      // --- New VM Settings ---
+      "vm_name": "Zakops",      // Name for the new VM folder and files on the datastore
+      "vmx_data": {                // Overrides or adds parameters to the new VMX file
+        "displayName": "Zakops-Machine", // Name displayed in vSphere/ESXi inventory
+        "memsize": "4096",           // RAM in MB (e.g., 4GB)
+        "numvcpus": "2",             // Number of virtual CPUs
+        "guestOS": "debian12-64"     // VMware Guest OS Identifier (important for optimizations)
+        //"annotation": "Built by Packer - Debian 12 Base" // Optional descriptive note
+      },
+
+      // --- ESXi Connection Settings ---
+      "remote_type": "esx5",           // Connect directly to an ESXi host
+      "remote_host": "Vmware-IP",      // IP address or hostname of your ESXi host
+      "remote_username": "root",       // ESXi username (use a dedicated user if possible)
+      "remote_password": "P@$w0rD",    // ESXi password
+      "remote_datastore": "Datastore2", // Target datastore for the new VM
+      "insecure_connection": true,     // Disables SSL certificate verification (use with caution)
+
+      // --- Guest VM Connection (SSH) ---
+      "ssh_username": "USER",              // Username inside the guest VM for provisioning
+      "ssh_host": "Zakops-Machine-IP",          // *Target* IP for SSH (VM needs to acquire this IP, often via DHCP first or set by a provisioner)
+      "ssh_port": 4422,                  // SSH port on the guest VM
+      "ssh_private_key_file": "/root/.ssh/id_ed25519", // Path to SSH private key for guest authentication
+      "ssh_certificate_file": "/root/.ssh/vault.pub", // Optional: Path to SSH certificate for signed key auth
+      "ssh_timeout": "3m",               // Timeout for SSH connection to the guest
+      "ssh_handshake_attempts": 5,       // Number of SSH connection retries
+      "ssh_clear_authorized_keys": true, // Removes Packer's temporary key after provisioning
+
+      // --- Build Process Options ---
+      "headless": true,                  // Run VM without a console window
+      "disable_vnc": true,               // Disable VNC access during build
+      "skip_export": true,               // Do not export the VM as OVF/OVA after build
+      "keep_registered": true,           // Keep the VM registered in ESXi after build
+
+      // --- Guest Shutdown ---
+      "shutdown_command": "echo 'packer' | sudo -S shutdown -h now" // Command to shut down the guest VM gracefully
+    }
+  ],
+  "provisioners": [
+    {
+      // --- Example Provisioner: Update Guest OS ---
+      "type": "shell",
+      "inline": [
+        "echo 'Running system updates...'",
+        "sudo apt update && sudo apt upgrade -y",
+        "echo 'System updates completed.'"
+        // Add more provisioning steps here (e.g., install software, configure services, set static IP)
+      ]
+    }
+  ]
+}
